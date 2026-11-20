@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Buat, kelola, dan cetak invoice A4 langsung dari browser. Data tersimpan di perangkat Anda.">
+  <meta name="theme-color" content="#F8FBFE">
+  <title>Invoice Generator</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="core.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Lewati ke konten</a>
+
+  <svg class="sprite" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="icon-print" viewBox="0 0 24 24"><path d="M7 8V3h10v5"/><path d="M7 17H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><rect x="7" y="14" width="10" height="7" rx="1"/></symbol>
+    <symbol id="icon-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="icon-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></symbol>
+    <symbol id="icon-up" viewBox="0 0 24 24"><path d="m6 15 6-6 6 6"/></symbol>
+    <symbol id="icon-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="icon-history" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="icon-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+    <symbol id="icon-download" viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></symbol>
+    <symbol id="icon-upload" viewBox="0 0 24 24"><path d="M12 21V9"/><path d="m7 14 5-5 5 5"/><path d="M5 3h14"/></symbol>
+    <symbol id="icon-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
+    <symbol id="icon-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="icon-alert" viewBox="0 0 24 24"><path d="M12 3 2 21h20L12 3Z"/><path d="M12 9v5"/><path d="M12 18h.01"/></symbol>
+    <symbol id="icon-file" viewBox="0 0 24 24"><path d="M6 2h8l4 4v16H6z"/><path d="M14 2v5h5"/><path d="M9 13h6M9 17h6"/></symbol>
+    <symbol id="icon-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+    <symbol id="icon-edit" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></symbol>
+    <symbol id="icon-bank" viewBox="0 0 24 24"><path d="M3 10h18M5 10V6l7-3 7 3v4M5 10v8M9 10v8M15 10v8M19 10v8M3 21h18"/></symbol>
+  </svg>
+
+  <div class="app">
+    <header class="topbar">
+      <button class="brand" id="brand-home" type="button" aria-label="Invoice Generator, buka editor">
+        <span class="brand__text">Invoice<span>Generator</span></span>
+        <span class="brand__tag">A4 &middot; lokal &middot; offline</span>
+      </button>
+
+      <nav class="topnav" aria-label="Navigasi utama">
+        <button type="button" class="topnav__item is-active" data-view="editor" aria-current="page">Buat</button>
+        <button type="button" class="topnav__item" data-view="history">Riwayat</button>
+        <button type="button" class="topnav__item" data-view="profile">Profil</button>
+      </nav>
+
+      <div class="topbar__actions">
+        <button type="button" class="btn btn--ghost btn--new" id="btn-new">
+          <svg class="icon" aria-hidden="true"><use href="#icon-plus"></use></svg>
+          <span>Invoice baru</span>
+        </button>
+        <button type="button" class="btn btn--primary" id="btn-print">
+          <svg class="icon" aria-hidden="true"><use href="#icon-print"></use></svg>
+          <span>Cetak / PDF</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="storage-banner" id="storage-banner" role="alert" hidden>
+      <svg class="icon" aria-hidden="true"><use href="#icon-alert"></use></svg>
+      <p id="storage-banner-text">Penyimpanan browser hampir penuh. Ekspor data lalu hapus invoice lama.</p>
+      <div class="storage-banner__actions">
+        <button type="button" class="btn btn--small btn--ghost" id="btn-export-now">Ekspor data</button>
+        <button type="button" class="icon-btn" id="btn-dismiss-banner" aria-label="Tutup peringatan">
+          <svg class="icon" aria-hidden="true"><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+    </div>
+
+    <main id="main" class="main">
+      <section class="view view--editor" id="view-editor" aria-labelledby="editor-title">
+        <div class="mobile-tabs" role="tablist" aria-label="Tampilan editor">
+          <button type="button" class="mobile-tab is-active" role="tab" id="tab-form" aria-selected="true" aria-controls="form-panel">Form</button>
+          <button type="button" class="mobile-tab" role="tab" id="tab-preview" aria-selected="false" aria-controls="preview-panel">Pratinjau</button>
+        </div>
+
+        <div class="editor-grid" id="editor-grid">
+          <div class="form-panel" id="form-panel" role="tabpanel" aria-labelledby="tab-form">
+            <div class="form-panel__head">
+              <div>
+                <h1 id="editor-title">Invoice baru</h1>
+                <p class="muted" id="editor-subtitle">Isi data di kiri, pratinjau A4 diperbarui langsung.</p>
+              </div>
+              <div class="form-panel__meta">
+                <button type="button" class="btn btn--small btn--ghost btn--new-inline" id="btn-new-inline">
+                  <svg class="icon" aria-hidden="true"><use href="#icon-plus"></use></svg>
+                  <span>Invoice baru</span>
+                </button>
+                <div class="save-state" id="save-state" role="status" aria-live="polite">
+                  <span class="save-state__dot" aria-hidden="true"></span>
+                  <span id="save-state-text">Tersimpan</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="notice" id="profile-reminder" hidden>
+              <div>
+                <strong>Lengkapi profil usaha</strong>
+                <p>Nama usaha dan rekening dipakai di setiap invoice. Isi sekali, langsung muncul di pratinjau.</p>
+              </div>
+              <button type="button" class="btn btn--small btn--ghost" id="btn-go-profile">Isi profil</button>
+            </div>
+
+            <form id="invoice-form" novalidate>
+              <section class="form-section" aria-labelledby="sec-info">
+                <div class="section-head">
+                  <h2 id="sec-info">Informasi invoice</h2>
+                  <p>Nomor, tanggal, dan status dokumen.</p>
+                </div>
+
+                <div class="field-grid field-grid--3">
+                  <div class="field field--span-2">
+                    <label for="invoice-number">Nomor invoice</label>
+                    <div class="input-group">
+                      <input class="input" id="invoice-number" type="text" autocomplete="off" spellcheck="false">
+                      <button type="button" class="btn btn--small btn--ghost" id="btn-regenerate-number">Nomor baru</button>
+                    </div>
+                    <p class="hint" id="number-hint">Format: INV/2026/11/0001</p>
+                    <p class="error" id="number-error" hidden></p>
+                  </div>
+
+                  <div class="field">
+                    <label for="invoice-status">Status</label>
+                    <select class="input" id="invoice-status">
+                      <option value="draft">Draft</option>
+                      <option value="sent">Terkirim</option>
+                      <option value="paid">Lunas</option>
+                      <option value="overdue">Jatuh tempo</option>
+                    </select>
+                  </div>
+
+                  <div class="field">
+                    <label for="issue-date">Tanggal terbit</label>
+                    <input class="input" id="issue-date" type="date">
+                    <p class="error" id="issue-error" hidden></p>
+                  </div>
+
+                  <div class="field">
+                    <label for="due-date">Jatuh tempo</label>
+                    <input class="input" id="due-date" type="date">
+                    <p class="error" id="due-error" hidden></p>
+                  </div>
+
+                  <div class="field">
+                    <label for="invoice-currency">Mata uang</label>
+                    <select class="input" id="invoice-currency" aria-describedby="currency-hint">
+                      <option value="IDR">IDR &middot; Rupiah</option>
+                      <option value="USD">USD &middot; Dolar AS</option>
+                      <option value="EUR">EUR &middot; Euro</option>
+                    </select>
+                    <p class="hint" id="currency-hint">Nilai tidak dikonversi saat mata uang diganti.</p>
+                  </div>
+                </div>
+
+                <div class="quick-dates" role="group" aria-label="Pilihan cepat jatuh tempo">
+                  <span class="quick-dates__label">Jatuh tempo cepat</span>
+                  <button type="button" class="chip" data-due="0">Tunai</button>
+                  <button type="button" class="chip" data-due="7">7 hari</button>
+                  <button type="button" class="chip" data-due="14">14 hari</button>
+                  <button type="button" class="chip" data-due="30">30 hari</button>
+                </div>
+              </section>
+
+              <section class="form-section" aria-labelledby="sec-customer">
+                <div class="section-head">
+                  <h2 id="sec-customer">Pelanggan</h2>
+                  <p>Nama pelanggan wajib diisi sebelum mencetak.</p>
+                </div>
+
+                <div class="field-grid field-grid--2">
+                  <div class="field">
+                    <label for="customer-name">Nama pelanggan</label>
+                    <input class="input" id="customer-name" type="text" autocomplete="off">
+                    <p class="error" id="customer-name-error" hidden></p>
+                  </div>
+                  <div class="field">
+                    <label for="customer-company">Perusahaan <span class="optional">(opsional)</span></label>
+                    <input class="input" id="customer-company" type="text" autocomplete="off">
+                  </div>
+                  <div class="field field--full">
+                    <label for="customer-address">Alamat <span class="optional">(opsional)</span></label>
+                    <textarea class="input" id="customer-address" rows="2"></textarea>
+                  </div>
+                  <div class="field">
+                    <label for="customer-phone">Telepon <span class="optional">(opsional)</span></label>
+                    <input class="input" id="customer-phone" type="tel" autocomplete="off">
+                  </div>
+                  <div class="field">
+                    <label for="customer-email">Email <span class="optional">(opsional)</span></label>
+                    <input class="input" id="customer-email" type="email" autocomplete="off">
+                    <p class="error" id="customer-email-error" hidden></p>
+                  </div>
+                </div>
+              </section>
+
+              <section class="form-section" aria-labelledby="sec-items">
+                <div class="section-head section-head--row">
+                  <div>
+                    <h2 id="sec-items">Item barang atau jasa</h2>
+                    <p>Tambah, hapus, dan ubah urutan baris.</p>
+                  </div>
+                  <button type="button" class="btn btn--small btn--ghost" id="btn-toggle-columns" aria-expanded="false" aria-controls="column-settings">Atur kolom</button>
+                </div>
+
+                <div class="column-settings" id="column-settings" hidden>
+                  <div class="column-settings__grid">
+                    <label class="check"><input type="checkbox" id="columns-unit" checked> <span>Tampilkan satuan</span></label>
+                    <label class="check"><input type="checkbox" id="columns-discount"> <span>Tampilkan diskon per baris</span></label>
+                    <div class="field">
+                      <label for="columns-desc-label">Label deskripsi</label>
+                      <input class="input" id="columns-desc-label" type="text" value="Deskripsi" maxlength="24">
+                    </div>
+                    <div class="field">
+                      <label for="columns-unit-label">Label satuan</label>
+                      <input class="input" id="columns-unit-label" type="text" value="Satuan" maxlength="16">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="item-head" aria-hidden="true">
+                  <span id="item-head-desc">Deskripsi</span>
+                  <span>Qty</span>
+                  <span data-col="unit" id="item-head-unit">Satuan</span>
+                  <span>Harga</span>
+                  <span data-col="discount">Diskon</span>
+                  <span>Jumlah</span>
+                  <span></span>
+                </div>
+
+                <div class="items-list" id="items-list"></div>
+
+                <div class="items-foot">
+                  <button type="button" class="btn btn--ghost" id="btn-add-item">
+                    <svg class="icon" aria-hidden="true"><use href="#icon-plus"></use></svg>
+                    <span>Tambah item</span>
+                  </button>
+                  <p class="error" id="items-error" hidden></p>
+                </div>
+              </section>
+
+              <section class="form-section" aria-labelledby="sec-totals">
+                <div class="section-head">
+                  <h2 id="sec-totals">Diskon, pajak, dan biaya</h2>
+                  <p>Total dihitung ulang setiap kali nilai berubah.</p>
+                </div>
+
+                <div class="field-grid field-grid--3">
+                  <div class="field">
+                    <label for="discount-type">Jenis diskon</label>
+                    <select class="input" id="discount-type">
+                      <option value="percent">Persen (%)</option>
+                      <option value="nominal">Nominal</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="discount-value">Nilai diskon</label>
+                    <input class="input" id="discount-value" type="text" inputmode="decimal" value="0">
+                    <p class="error" id="discount-error" hidden></p>
+                  </div>
+                  <div class="field">
+                    <label for="extra-fee">Biaya tambahan <span class="optional">(opsional)</span></label>
+                    <input class="input" id="extra-fee" type="text" inputmode="decimal" placeholder="0">
+                  </div>
+                </div>
+
+                <div class="tax-row">
+                  <label class="switch">
+                    <input type="checkbox" id="tax-enabled" checked>
+                    <span class="switch__track" aria-hidden="true"></span>
+                    <span class="switch__label">Aktifkan PPN</span>
+                  </label>
+                  <div class="field field--tax">
+                    <label for="tax-rate">Tarif PPN (%)</label>
+                    <input class="input" id="tax-rate" type="text" inputmode="decimal" value="11">
+                    <p class="error" id="tax-rate-error" hidden></p>
+                  </div>
+                </div>
+              </section>
+
+              <section class="form-section" aria-labelledby="sec-notes">
+                <div class="section-head">
+                  <h2 id="sec-notes">Catatan dan syarat</h2>
+                  <p>Dapat diubah untuk invoice ini saja.</p>
+                </div>
+
+                <div class="field-grid field-grid--2">
+                  <div class="field field--full">
+                    <label for="invoice-notes">Catatan</label>
+                    <textarea class="input" id="invoice-notes" rows="3" placeholder="Terima kasih atas kepercayaan Anda."></textarea>
+                  </div>
+                  <div class="field field--full">
+                    <label for="invoice-terms">Syarat pembayaran</label>
+                    <textarea class="input" id="invoice-terms" rows="3" placeholder="Pembayaran paling lambat 14 hari setelah tanggal terbit."></textarea>
+                  </div>
+                </div>
+              </section>
+            </form>
+          </div>
+
+          <aside class="preview-panel" id="preview-panel" role="tabpanel" aria-labelledby="tab-preview">
+            <div class="preview-bar">
+              <div>
+                <h2 id="preview-title">Pratinjau A4</h2>
+                <p id="preview-meta">210 &times; 297 mm</p>
+              </div>
+              <div class="preview-actions">
+                <button type="button" class="btn btn--small btn--ghost" id="btn-tips">Tips PDF</button>
+                <button type="button" class="btn btn--small btn--ghost" id="btn-download-invoice">
+                  <svg class="icon" aria-hidden="true"><use href="#icon-download"></use></svg>
+                  <span>Unduh JSON</span>
+                </button>
+                <button type="button" class="btn btn--small btn--primary" id="btn-print-preview">
+                  <svg class="icon" aria-hidden="true"><use href="#icon-print"></use></svg>
+                  <span>Cetak</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="paper-stage" id="paper-stage">
+              <div class="paper-fit" id="paper-fit">
+                <div class="paper-scaler" id="paper-scaler">
+                  <article class="invoice-paper" id="invoice-paper" aria-label="Pratinjau invoice">
+                    <div class="paper-strip" aria-hidden="true"></div>
+
+                    <div class="invoice-body">
+                      <header class="invoice-head">
+                        <div class="invoice-business">
+                          <img class="invoice-logo" id="inv-logo" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" width="240" height="120" alt="" hidden>
+                          <div class="business-text">
+                            <p class="business-name" id="inv-business-name">Nama Usaha</p>
+                            <p class="business-line" id="inv-business-address">Alamat usaha</p>
+                            <p class="business-line" id="inv-business-contact">Telepon &middot; Email</p>
+                            <p class="business-line" id="inv-business-web" hidden>Website</p>
+                            <p class="business-line" id="inv-business-npwp" hidden>NPWP</p>
+                          </div>
+                        </div>
+
+                        <div class="invoice-title-block">
+                          <p class="invoice-kicker">INVOICE</p>
+                          <p class="invoice-number" id="inv-number">INV/2026/11/0001</p>
+                          <span class="status-pill status--draft" id="inv-status">Draft</span>
+                        </div>
+                      </header>
+
+                      <div class="invoice-rule" aria-hidden="true"></div>
+
+                      <section class="invoice-parties" aria-label="Pelanggan dan tanggal">
+                        <div class="bill-to">
+                          <p class="invoice-label">Ditagihkan kepada</p>
+                          <p class="party-name" id="inv-customer-name">Nama pelanggan</p>
+                          <p class="party-line" id="inv-customer-company" hidden>Perusahaan</p>
+                          <p class="party-line" id="inv-customer-address" hidden>Alamat</p>
+                          <p class="party-line" id="inv-customer-contact" hidden>Telepon &middot; Email</p>
+                        </div>
+                        <dl class="invoice-dates">
+                          <div>
+                            <dt>Tanggal terbit</dt>
+                            <dd id="inv-issue">Belum diisi</dd>
+                          </div>
+                          <div>
+                            <dt>Jatuh tempo</dt>
+                            <dd id="inv-due">Belum diisi</dd>
+                          </div>
+                        </dl>
+                      </section>
+
+                      <div class="invoice-table-wrap">
+                        <table class="invoice-table">
+                          <colgroup>
+                            <col class="col-no">
+                            <col class="col-desc">
+                            <col class="col-qty">
+                            <col class="col-unit" data-col="unit">
+                            <col class="col-price">
+                            <col class="col-disc" data-col="discount">
+                            <col class="col-amount">
+                          </colgroup>
+                          <thead>
+                            <tr>
+                              <th class="col-no" scope="col">No</th>
+                              <th class="col-desc" id="th-desc" scope="col">Deskripsi</th>
+                              <th class="col-qty" scope="col">Qty</th>
+                              <th class="col-unit" id="th-unit" scope="col" data-col="unit">Satuan</th>
+                              <th class="col-price" scope="col">Harga</th>
+                              <th class="col-disc" scope="col" data-col="discount">Diskon</th>
+                              <th class="col-amount" scope="col">Jumlah</th>
+                            </tr>
+                          </thead>
+                          <tbody id="inv-items"></tbody>
+                        </table>
+                      </div>
+
+                      <div class="invoice-summary">
+                        <div class="summary-left">
+                          <div class="terbilang">
+                            <p class="invoice-label">Terbilang</p>
+                            <p id="inv-terbilang">Nol rupiah</p>
+                          </div>
+                          <div class="invoice-notes" id="inv-notes-wrap" hidden>
+                            <p class="invoice-label">Catatan</p>
+                            <p id="inv-notes"></p>
+                          </div>
+                        </div>
+
+                        <div class="summary-right">
+                          <dl class="totals">
+                            <div>
+                              <dt>Subtotal</dt>
+                              <dd id="inv-subtotal">Rp 0</dd>
+                            </div>
+                            <div id="row-discount" hidden>
+                              <dt>Diskon</dt>
+                              <dd id="inv-discount">Rp 0</dd>
+                            </div>
+                            <div id="row-dpp" hidden>
+                              <dt>DPP</dt>
+                              <dd id="inv-dpp">Rp 0</dd>
+                            </div>
+                            <div id="row-tax" hidden>
+                              <dt id="inv-tax-label">PPN 11%</dt>
+                              <dd id="inv-tax">Rp 0</dd>
+                            </div>
+                            <div id="row-fee" hidden>
+                              <dt>Biaya tambahan</dt>
+                              <dd id="inv-fee">Rp 0</dd>
+                            </div>
+                          </dl>
+                          <div class="total-box">
+                            <span>Total</span>
+                            <strong id="inv-total">Rp 0</strong>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="invoice-bottom">
+                        <footer class="invoice-foot">
+                          <div class="payment">
+                            <p class="invoice-label">Pembayaran</p>
+                            <div class="payment-lines" id="inv-accounts"></div>
+                          </div>
+                          <div class="signature">
+                            <p class="invoice-label">Hormat kami,</p>
+                            <div class="signature-space" aria-hidden="true"></div>
+                            <p class="signature-name" id="inv-signature-name">Nama penandatangan</p>
+                            <p class="signature-title" id="inv-signature-title">Jabatan</p>
+                          </div>
+                        </footer>
+
+                        <div class="invoice-terms" id="inv-terms-wrap" hidden>
+                          <p class="invoice-label">Syarat pembayaran</p>
+                          <p id="inv-terms"></p>
+                        </div>
+
+                        <p class="invoice-thanks">Terima kasih atas kepercayaan Anda.</p>
+                      </div>
+                    </div>
+
+                    <div class="paper-strip paper-strip--bottom" aria-hidden="true"></div>
+                  </article>
+                </div>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="view view--history" id="view-history" aria-labelledby="history-title" hidden>
+        <div class="view-head">
+          <div>
+            <h1 id="history-title">Riwayat invoice</h1>
+            <p id="history-subtitle">Semua invoice tersimpan di browser ini.</p>
+          </div>
+          <div class="view-head__actions">
+            <button type="button" class="btn btn--ghost" id="btn-import-invoice">
+              <svg class="icon" aria-hidden="true"><use href="#icon-upload"></use></svg>
+              <span>Impor invoice</span>
+            </button>
+            <button type="button" class="btn btn--primary" id="btn-history-new">
+              <svg class="icon" aria-hidden="true"><use href="#icon-plus"></use></svg>
+              <span>Invoice baru</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="history-tools">
+          <label class="search-field" for="history-search">
+            <svg class="icon" aria-hidden="true"><use href="#icon-search"></use></svg>
+            <input id="history-search" type="search" placeholder="Cari nomor atau pelanggan" autocomplete="off">
+          </label>
+          <label class="filter-field" for="history-status-filter">
+            <span class="sr-only">Filter status</span>
+            <select class="input" id="history-status-filter">
+              <option value="all">Semua status</option>
+              <option value="draft">Draft</option>
+              <option value="sent">Terkirim</option>
+              <option value="paid">Lunas</option>
+              <option value="overdue">Jatuh tempo</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="history-list" id="history-list"></div>
+
+        <div class="empty-state" id="history-empty" hidden>
+          <svg class="empty-state__icon" aria-hidden="true"><use href="#icon-file"></use></svg>
+          <h2>Belum ada invoice</h2>
+          <p>Mulai dari invoice pertama. Nomor dan tanggal sudah disiapkan otomatis.</p>
+          <button type="button" class="btn btn--primary" id="btn-empty-new">Buat invoice pertama</button>
+        </div>
+
+        <div class="empty-state" id="history-no-results" hidden>
+          <svg class="empty-state__icon" aria-hidden="true"><use href="#icon-search"></use></svg>
+          <h2>Tidak ada yang cocok</h2>
+          <p>Coba kata kunci lain atau tampilkan semua status.</p>
+          <button type="button" class="btn btn--ghost" id="btn-reset-filters">Reset filter</button>
+        </div>
+      </section>
+
+      <section class="view view--profile" id="view-profile" aria-labelledby="profile-title" hidden>
+        <div class="view-head">
+          <div>
+            <h1 id="profile-title">Profil usaha</h1>
+            <p>Data ini dipakai di setiap invoice baru.</p>
+          </div>
+          <div class="save-state" id="profile-save-state" role="status" aria-live="polite">
+            <span class="save-state__dot" aria-hidden="true"></span>
+            <span id="profile-save-state-text">Tersimpan</span>
+          </div>
+        </div>
+
+        <form class="profile-form" id="profile-form" novalidate>
+          <section class="panel" aria-labelledby="profile-sec-business">
+            <div class="section-head">
+              <h2 id="profile-sec-business">Identitas usaha</h2>
+              <p>Nama dan kontak yang tampil di kepala invoice.</p>
+            </div>
+
+            <div class="field-grid field-grid--2">
+              <div class="field">
+                <label for="profile-business-name">Nama usaha</label>
+                <input class="input" id="profile-business-name" type="text" autocomplete="organization">
+                <p class="error" id="profile-business-name-error" hidden></p>
+              </div>
+              <div class="field">
+                <label for="profile-business-phone">Telepon</label>
+                <input class="input" id="profile-business-phone" type="tel" autocomplete="tel">
+              </div>
+              <div class="field field--full">
+                <label for="profile-business-address">Alamat</label>
+                <textarea class="input" id="profile-business-address" rows="2"></textarea>
+              </div>
+              <div class="field">
+                <label for="profile-business-email">Email</label>
+                <input class="input" id="profile-business-email" type="email" autocomplete="email">
+              </div>
+              <div class="field">
+                <label for="profile-business-website">Website</label>
+                <input class="input" id="profile-business-website" type="text" autocomplete="url">
+              </div>
+              <div class="field">
+                <label for="profile-business-npwp">NPWP <span class="optional">(opsional)</span></label>
+                <input class="input" id="profile-business-npwp" type="text" inputmode="numeric">
+              </div>
+            </div>
+
+            <div class="logo-field">
+              <div class="logo-preview" id="logo-preview-wrap">
+                <img id="logo-preview" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" width="240" height="120" alt="Logo usaha" hidden>
+                <span class="logo-placeholder" id="logo-placeholder">Belum ada logo</span>
+              </div>
+              <div class="logo-actions">
+                <div class="logo-actions__buttons">
+                  <button type="button" class="btn btn--ghost" id="btn-upload-logo">
+                    <svg class="icon" aria-hidden="true"><use href="#icon-upload"></use></svg>
+                    <span>Unggah logo</span>
+                  </button>
+                  <button type="button" class="btn btn--ghost btn--danger-text" id="btn-remove-logo" hidden>Hapus logo</button>
+                </div>
+                <p class="hint">PNG, JPG, atau SVG. Maksimal 1 MB. Logo dikompres otomatis.</p>
+                <p class="error" id="logo-error" hidden></p>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel" aria-labelledby="profile-sec-payment">
+            <div class="section-head">
+              <h2 id="profile-sec-payment">Rekening pembayaran</h2>
+              <p>Bisa lebih dari satu rekening. Tampil di bagian pembayaran invoice.</p>
+            </div>
+            <div class="accounts-list" id="accounts-list"></div>
+            <p class="error" id="accounts-error" hidden></p>
+            <button type="button" class="btn btn--ghost" id="btn-add-account">
+              <svg class="icon" aria-hidden="true"><use href="#icon-plus"></use></svg>
+              <span>Tambah rekening</span>
+            </button>
+          </section>
+
+          <section class="panel" aria-labelledby="profile-sec-defaults">
+            <div class="section-head">
+              <h2 id="profile-sec-defaults">Catatan default</h2>
+              <p>Dipakai saat invoice baru dibuat. Tetap bisa diubah per invoice.</p>
+            </div>
+            <div class="field-grid field-grid--2">
+              <div class="field field--full">
+                <label for="profile-notes">Catatan</label>
+                <textarea class="input" id="profile-notes" rows="3"></textarea>
+              </div>
+              <div class="field field--full">
+                <label for="profile-terms">Syarat pembayaran</label>
+                <textarea class="input" id="profile-terms" rows="3"></textarea>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel" aria-labelledby="profile-sec-signature">
+            <div class="section-head">
+              <h2 id="profile-sec-signature">Tanda tangan</h2>
+              <p>Nama dan jabatan di bagian bawah invoice.</p>
+            </div>
+            <div class="field-grid field-grid--2">
+              <div class="field">
+                <label for="profile-signature-name">Nama penandatangan</label>
+                <input class="input" id="profile-signature-name" type="text">
+              </div>
+              <div class="field">
+                <label for="profile-signature-title">Jabatan</label>
+                <input class="input" id="profile-signature-title" type="text">
+              </div>
+            </div>
+          </section>
+
+          <section class="panel" aria-labelledby="profile-sec-settings">
+            <div class="section-head">
+              <h2 id="profile-sec-settings">Pengaturan invoice</h2>
+              <p>Berlaku untuk invoice baru, bukan invoice yang sudah ada.</p>
+            </div>
+            <div class="field-grid field-grid--2">
+              <div class="field field--full">
+                <label for="profile-number-format">Format nomor invoice</label>
+                <input class="input" id="profile-number-format" type="text" spellcheck="false">
+                <p class="hint">Token: {yyyy}, {mm}, {dd}, {seq}, {seq:4}. Contoh: INV/{yyyy}/{mm}/{seq:4}</p>
+                <p class="hint hint--strong" id="number-format-preview">Berikutnya: INV/2026/11/0001</p>
+              </div>
+              <div class="field">
+                <label for="profile-tax-rate">Tarif PPN default (%)</label>
+                <input class="input" id="profile-tax-rate" type="text" inputmode="decimal">
+                <p class="error" id="profile-tax-rate-error" hidden></p>
+              </div>
+              <div class="field">
+                <label for="profile-currency">Mata uang default</label>
+                <select class="input" id="profile-currency">
+                  <option value="IDR">IDR &middot; Rupiah</option>
+                  <option value="USD">USD &middot; Dolar AS</option>
+                  <option value="EUR">EUR &middot; Euro</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="profile-due-days">Jatuh tempo default</label>
+                <select class="input" id="profile-due-days">
+                  <option value="0">Tunai</option>
+                  <option value="7">7 hari</option>
+                  <option value="14">14 hari</option>
+                  <option value="30">30 hari</option>
+                </select>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel" aria-labelledby="profile-sec-data">
+            <div class="section-head">
+              <h2 id="profile-sec-data">Data dan cadangan</h2>
+              <p>Semua data tersimpan di browser ini, bukan di server.</p>
+            </div>
+            <p class="storage-line" id="storage-usage">Menghitung penyimpanan...</p>
+            <div class="data-actions">
+              <button type="button" class="btn btn--ghost" id="btn-export-all">
+                <svg class="icon" aria-hidden="true"><use href="#icon-download"></use></svg>
+                <span>Ekspor semua data</span>
+              </button>
+              <button type="button" class="btn btn--ghost" id="btn-import-all">
+                <svg class="icon" aria-hidden="true"><use href="#icon-upload"></use></svg>
+                <span>Impor data</span>
+              </button>
+            </div>
+            <p class="hint">Ekspor rutin disarankan. Menghapus data browser akan menghapus semua invoice.</p>
+          </section>
+
+          <div class="profile-actions">
+            <button type="submit" class="btn btn--primary" id="btn-save-profile">Simpan profil</button>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <nav class="mobile-nav" aria-label="Navigasi seluler">
+      <button type="button" class="mobile-nav__item is-active" data-view="editor" aria-current="page">
+        <svg class="icon" aria-hidden="true"><use href="#icon-edit"></use></svg>
+        <span>Buat</span>
+      </button>
+      <button type="button" class="mobile-nav__item" data-view="history">
+        <svg class="icon" aria-hidden="true"><use href="#icon-history"></use></svg>
+        <span>Riwayat</span>
+      </button>
+      <button type="button" class="mobile-nav__item" data-view="profile">
+        <svg class="icon" aria-hidden="true"><use href="#icon-user"></use></svg>
+        <span>Profil</span>
+      </button>
+    </nav>
+  </div>
+
+  <dialog class="dialog" id="confirm-dialog" aria-labelledby="confirm-title">
+    <form method="dialog" class="dialog__panel">
+      <div class="dialog__head">
+        <h2 id="confirm-title">Konfirmasi</h2>
+        <button type="submit" value="cancel" class="icon-btn" aria-label="Tutup dialog">
+          <svg class="icon" aria-hidden="true"><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <p id="confirm-message" class="dialog__message"></p>
+      <div class="dialog__actions">
+        <button type="submit" value="cancel" class="btn btn--ghost">Batal</button>
+        <button type="submit" value="confirm" class="btn btn--danger" id="confirm-ok">Lanjutkan</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="dialog" id="tips-dialog" aria-labelledby="tips-title">
+    <form method="dialog" class="dialog__panel">
+      <div class="dialog__head">
+        <h2 id="tips-title">Tips cetak PDF</h2>
+        <button type="submit" value="close" class="icon-btn" aria-label="Tutup dialog">
+          <svg class="icon" aria-hidden="true"><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <ol class="tips-list">
+        <li>Pilih <strong>Save as PDF</strong> sebagai tujuan cetak.</li>
+        <li>Matikan <strong>Headers and footers</strong> agar tidak ada teks browser di tepi kertas.</li>
+        <li>Aktifkan <strong>Background graphics</strong> agar gradien dan warna tabel ikut tercetak.</li>
+        <li>Gunakan skala <strong>100%</strong> dan margin <strong>Default</strong>.</li>
+      </ol>
+      <p class="hint">Pengaturan ini berada di dialog cetak browser dan hanya perlu diatur sekali.</p>
+      <div class="dialog__actions">
+        <button type="submit" value="close" class="btn btn--primary">Mengerti</button>
+      </div>
+    </form>
+  </dialog>
+
+  <input type="file" id="import-file" accept="application/json,.json" hidden>
+  <input type="file" id="logo-file" accept="image/png,image/jpeg,image/svg+xml" hidden>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden>
+    <svg class="icon toast__icon" aria-hidden="true"><use href="#icon-check"></use></svg>
+    <span id="toast-text"></span>
+  </div>
+
+  <template id="item-row-template">
+    <div class="item-row">
+      <div class="item-cell item-cell--desc">
+        <label class="item-label" data-label-for="desc">Deskripsi</label>
+        <input class="input item-input" data-field="desc" type="text" placeholder="Jasa desain logo" autocomplete="off">
+        <p class="row-warning" data-warning hidden></p>
+      </div>
+      <div class="item-cell item-cell--qty">
+        <label class="item-label" data-label-for="qty">Qty</label>
+        <input class="input item-input" data-field="qty" type="text" inputmode="decimal" placeholder="1" autocomplete="off">
+      </div>
+      <div class="item-cell item-cell--unit" data-col="unit">
+        <label class="item-label" data-label-for="unit">Satuan</label>
+        <input class="input item-input" data-field="unit" type="text" placeholder="paket" autocomplete="off">
+      </div>
+      <div class="item-cell item-cell--price">
+        <label class="item-label" data-label-for="price">Harga/unit</label>
+        <input class="input item-input" data-field="price" type="text" inputmode="decimal" placeholder="0" autocomplete="off">
+      </div>
+      <div class="item-cell item-cell--disc" data-col="discount">
+        <label class="item-label" data-label-for="discount">Diskon</label>
+        <input class="input item-input" data-field="discount" type="text" inputmode="decimal" placeholder="0" autocomplete="off">
+      </div>
+      <div class="item-cell item-cell--total">
+        <span class="item-label">Jumlah</span>
+        <output class="line-total" data-line-total>Rp 0</output>
+      </div>
+      <div class="item-cell item-cell--actions">
+        <div class="row-actions">
+          <button type="button" class="icon-btn" data-action="up" aria-label="Naikkan item">
+            <svg class="icon" aria-hidden="true"><use href="#icon-up"></use></svg>
+          </button>
+          <button type="button" class="icon-btn" data-action="down" aria-label="Turunkan item">
+            <svg class="icon" aria-hidden="true"><use href="#icon-down"></use></svg>
+          </button>
+          <button type="button" class="icon-btn icon-btn--danger" data-action="remove" aria-label="Hapus item">
+            <svg class="icon" aria-hidden="true"><use href="#icon-trash"></use></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <template id="account-row-template">
+    <div class="account-row">
+      <div class="field">
+        <label data-label-for="bank">Bank</label>
+        <input class="input account-input" data-field="bank" type="text" placeholder="BCA" autocomplete="off">
+      </div>
+      <div class="field">
+        <label data-label-for="number">Nomor rekening</label>
+        <input class="input account-input" data-field="number" type="text" inputmode="numeric" placeholder="1234567890" autocomplete="off">
+      </div>
+      <div class="field">
+        <label data-label-for="holder">Atas nama</label>
+        <input class="input account-input" data-field="holder" type="text" placeholder="Nama pemilik rekening" autocomplete="off">
+      </div>
+      <button type="button" class="icon-btn icon-btn--danger account-remove" data-action="remove-account" aria-label="Hapus rekening">
+        <svg class="icon" aria-hidden="true"><use href="#icon-trash"></use></svg>
+      </button>
+    </div>
+  </template>
+
+  <noscript>
+    <div class="noscript">Aplikasi ini membutuhkan JavaScript. Aktifkan JavaScript di browser lalu muat ulang halaman.</div>
+  </noscript>
+</body>
+</html>

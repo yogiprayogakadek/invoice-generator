@@ -1,0 +1,240 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-20T00:00:00.000Z",
+  "title": "Design System: Invoice Generator",
+  "extensions": {
+    "colorMeta": {
+      "sky-700": {
+        "role": "primary",
+        "displayName": "Deep Sky",
+        "canonical": "#0369a1",
+        "tonalRamp": ["#0c4a6e", "#075985", "#0369a1", "#0284c7", "#0ea5e9", "#38bdf8", "#7dd3fc", "#bae6fd"]
+      },
+      "sky-100": {
+        "role": "secondary",
+        "displayName": "Sky Wash",
+        "canonical": "#f0f9ff",
+        "tonalRamp": ["#0c4a6e", "#075985", "#0369a1", "#0284c7", "#0ea5e9", "#7dd3fc", "#e0f2fe", "#f0f9ff"]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Paper White",
+        "canonical": "#ffffff",
+        "tonalRamp": ["#0f172a", "#334155", "#5a6b80", "#94a3b8", "#cbd5e1", "#e2e8f0", "#f1f5f9", "#ffffff"]
+      },
+      "page": {
+        "role": "neutral",
+        "displayName": "Page Mist",
+        "canonical": "#f8fbfe",
+        "tonalRamp": ["#0f172a", "#1e293b", "#334155", "#64748b", "#94a3b8", "#cbd5e1", "#eef6fc", "#f8fbfe"]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Slate Ink",
+        "canonical": "#0f172a",
+        "tonalRamp": ["#020617", "#0f172a", "#1e293b", "#334155", "#475569", "#64748b", "#94a3b8", "#cbd5e1"]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted Slate",
+        "canonical": "#5a6b80",
+        "tonalRamp": ["#0f172a", "#334155", "#475569", "#5a6b80", "#7c8ba0", "#a3b0c2", "#cbd5e1", "#e2e8f0"]
+      },
+      "success": {
+        "role": "tertiary",
+        "displayName": "Paid Green",
+        "canonical": "#10b981",
+        "tonalRamp": ["#064e3b", "#065f46", "#047857", "#10b981", "#34d399", "#6ee7b7", "#a7f3d0", "#d1fae5"]
+      },
+      "danger": {
+        "role": "tertiary",
+        "displayName": "Alert Red",
+        "canonical": "#ef4444",
+        "tonalRamp": ["#7f1d1d", "#991b1b", "#b91c1c", "#ef4444", "#f87171", "#fca5a5", "#fecaca", "#fee2e2"]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Invoice Display",
+        "purpose": "The wide-tracked INVOICE wordmark on the paper only."
+      },
+      "headline": {
+        "displayName": "Page Headline",
+        "purpose": "Page titles for the editor, history, and profile views."
+      },
+      "title": {
+        "displayName": "Section Title",
+        "purpose": "Form section headings and the business name on the paper."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Form copy, history rows, and profile fields."
+      },
+      "label": {
+        "displayName": "Micro Label",
+        "purpose": "Item labels, invoice field labels, and table headers."
+      }
+    },
+    "shadows": [
+      {
+        "name": "paper-lift",
+        "value": "0 24px 60px rgba(15, 23, 42, 0.1), 0 4px 12px rgba(15, 23, 42, 0.04)",
+        "purpose": "Lifts the A4 preview off the desk. Reserved for the paper."
+      },
+      {
+        "name": "panel-rest",
+        "value": "0 1px 2px rgba(15, 23, 42, 0.03)",
+        "purpose": "Keeps form and profile panels barely separated from the page."
+      },
+      {
+        "name": "dialog-lift",
+        "value": "0 24px 60px rgba(15, 23, 42, 0.2)",
+        "purpose": "Lifts confirmation and tips dialogs above the backdrop."
+      }
+    ],
+    "motion": [
+      {
+        "name": "state-fast",
+        "value": "160ms ease",
+        "purpose": "Hover, focus, border, and background state changes."
+      },
+      {
+        "name": "toast-in",
+        "value": "180ms ease-out",
+        "purpose": "The single toast entrance."
+      }
+    ],
+    "breakpoints": [
+      { "name": "wide", "value": "1180px" },
+      { "name": "tablet", "value": "900px" },
+      { "name": "mobile", "value": "720px" },
+      { "name": "narrow", "value": "480px" }
+    ],
+    "dials": {
+      "energy": 1,
+      "rhythm": 1,
+      "motion": 1,
+      "statement": "Calm by design: a predictable form, one paper focal point, and hover-state motion only."
+    }
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one deep-sky action on a surface, used for print and save.",
+      "html": "<button class=\"ds-btn-primary\">Cetak / PDF</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 16px; border: 1px solid transparent; border-radius: 10px; background: var(--sky-700, #0369a1); color: #ffffff; font: 600 13px/1 Inter, 'Segoe UI', system-ui, sans-serif; cursor: pointer; box-shadow: 0 1px 2px rgba(3, 105, 161, 0.24); transition: background-color 160ms ease; } .ds-btn-primary:hover { background: var(--sky-800, #075985); } .ds-btn-primary:focus-visible { outline: 2px solid var(--sky-600, #0284c7); outline-offset: 2px; } .ds-btn-primary:active { transform: translateY(1px); }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Secondary actions such as Invoice baru, Buka, and Duplikat.",
+      "html": "<button class=\"ds-btn-ghost\">Invoice baru</button>",
+      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 16px; border: 1px solid var(--line-strong, #cfe3f1); border-radius: 10px; background: var(--paper, #ffffff); color: var(--ink-soft, #334155); font: 600 13px/1 Inter, 'Segoe UI', system-ui, sans-serif; cursor: pointer; transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease; } .ds-btn-ghost:hover { background: var(--sky-100, #f0f9ff); border-color: var(--sky-300, #bae6fd); color: var(--sky-800, #075985); } .ds-btn-ghost:focus-visible { outline: 2px solid var(--sky-600, #0284c7); outline-offset: 2px; }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "The standard 44 px field with a sky focus ring and inline error state.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-field__label\">Nama pelanggan</span><input class=\"ds-input\" type=\"text\" placeholder=\"PT Cahaya Nusantara\"></label>",
+      "css": ".ds-field { display: grid; gap: 6px; font: 600 12.5px/1.4 Inter, 'Segoe UI', system-ui, sans-serif; color: var(--ink-soft, #334155); } .ds-input { width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line-strong, #cfe3f1); border-radius: 10px; background: #ffffff; color: var(--ink, #0f172a); font: 400 13.5px/1.35 Inter, 'Segoe UI', system-ui, sans-serif; transition: border-color 160ms ease, box-shadow 160ms ease; } .ds-input::placeholder { color: var(--muted, #5a6b80); } .ds-input:focus { outline: none; border-color: var(--sky-500, #0ea5e9); box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.18); } .ds-input[aria-invalid=\"true\"] { border-color: var(--danger, #ef4444); box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1); }"
+    },
+    {
+      "name": "Navigation Item",
+      "kind": "nav",
+      "refersTo": "nav-item",
+      "description": "The segmented Buat, Riwayat, Profil control in the top bar.",
+      "html": "<nav class=\"ds-nav\"><button class=\"ds-nav__item is-active\">Buat</button><button class=\"ds-nav__item\">Riwayat</button><button class=\"ds-nav__item\">Profil</button></nav>",
+      "css": ".ds-nav { display: inline-flex; gap: 2px; padding: 4px; border-radius: 12px; background: var(--sky-100, #f0f9ff); } .ds-nav__item { min-height: 44px; padding: 0 16px; border: 0; border-radius: 8px; background: transparent; color: var(--muted, #5a6b80); font: 600 12.5px/1 Inter, 'Segoe UI', system-ui, sans-serif; cursor: pointer; transition: background-color 160ms ease, color 160ms ease, box-shadow 160ms ease; } .ds-nav__item:hover { background: rgba(255, 255, 255, 0.7); color: var(--sky-800, #075985); } .ds-nav__item.is-active { background: #ffffff; color: var(--sky-800, #075985); box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06); } .ds-nav__item:focus-visible { outline: 2px solid var(--sky-600, #0284c7); outline-offset: 2px; }"
+    },
+    {
+      "name": "Quick Date Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "A one-tap due-date action. Selected state is a sky wash, not a pill.",
+      "html": "<div class=\"ds-chips\"><button class=\"ds-chip\">Tunai</button><button class=\"ds-chip is-selected\">14 hari</button><button class=\"ds-chip\">30 hari</button></div>",
+      "css": ".ds-chips { display: flex; flex-wrap: wrap; gap: 8px; } .ds-chip { min-height: 44px; padding: 0 12px; border: 1px solid var(--line-strong, #cfe3f1); border-radius: 8px; background: #ffffff; color: var(--muted, #5a6b80); font: 600 12px/1 Inter, 'Segoe UI', system-ui, sans-serif; cursor: pointer; transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease; } .ds-chip:hover { background: var(--sky-100, #f0f9ff); border-color: var(--sky-300, #bae6fd); color: var(--sky-800, #075985); } .ds-chip.is-selected { background: var(--sky-100, #f0f9ff); border-color: var(--sky-400, #38bdf8); color: var(--sky-800, #075985); } .ds-chip:focus-visible { outline: 2px solid var(--sky-600, #0284c7); outline-offset: 2px; }"
+    },
+    {
+      "name": "Form Panel",
+      "kind": "card",
+      "refersTo": null,
+      "description": "The flat white work surface that holds the invoice form.",
+      "html": "<section class=\"ds-panel\"><h2 class=\"ds-panel__title\">Informasi invoice</h2><p class=\"ds-panel__copy\">Nomor, tanggal, dan status dokumen.</p></section>",
+      "css": ".ds-panel { padding: 28px; border: 1px solid var(--line, #e2eef7); border-radius: 18px; background: #ffffff; box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03); } .ds-panel__title { margin: 0; color: var(--ink, #0f172a); font: 700 15px/1.3 Inter, 'Segoe UI', system-ui, sans-serif; letter-spacing: -0.015em; } .ds-panel__copy { margin: 3px 0 0; color: var(--muted, #5a6b80); font: 400 12.5px/1.5 Inter, 'Segoe UI', system-ui, sans-serif; }"
+    },
+    {
+      "name": "Invoice Total",
+      "kind": "custom",
+      "refersTo": "invoice-total",
+      "description": "The deep-sky total block that closes every invoice.",
+      "html": "<div class=\"ds-total\"><span>Total</span><strong>Rp 2.886.000</strong></div>",
+      "css": ".ds-total { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 14px; border-radius: 10px; background: linear-gradient(135deg, #0369a1 0%, #075985 100%); color: #ffffff; -webkit-print-color-adjust: exact; print-color-adjust: exact; } .ds-total span { font: 700 9px/1 Inter, 'Segoe UI', system-ui, sans-serif; letter-spacing: 0.1em; text-transform: uppercase; } .ds-total strong { font: 700 16px/1 Inter, 'Segoe UI', system-ui, sans-serif; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; white-space: nowrap; }"
+    },
+    {
+      "name": "Status Pill",
+      "kind": "chip",
+      "refersTo": "status-pill",
+      "description": "A real document state: draft, sent, paid, or overdue.",
+      "html": "<span class=\"ds-status ds-status--paid\">Lunas</span>",
+      "css": ".ds-status { display: inline-flex; align-items: center; min-height: 18px; padding: 3px 8px; border-radius: 999px; font: 700 10px/1.2 Inter, 'Segoe UI', system-ui, sans-serif; letter-spacing: 0.06em; text-transform: uppercase; } .ds-status--paid { background: var(--success-soft, #d1fae5); color: var(--success-ink, #065f46); } .ds-status--draft { background: var(--sky-100, #f0f9ff); color: var(--sky-800, #075985); } .ds-status--overdue { background: var(--danger-soft, #fee2e2); color: var(--danger-ink, #991b1b); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Sky-Lit Paper Desk",
+    "overview": "Invoice Generator is a quiet work desk where the invoice is the brightest object. The form is a compact instrument on the left; the A4 paper is the product on the right. Every screen keeps that relationship: the user writes, the paper answers. The interface avoids dashboard chrome, card mosaics, and decorative motion because the document itself carries the visual weight.\n\nThe palette is one cool sky family over paper white, with slate ink and status-only green, red, and amber. Depth is restrained: hairline borders and tonal layers hold the work surface, while only the paper and modal surfaces lift with a soft ambient shadow. The paired sky gradient strips at the top and bottom edges of the paper and the deep-sky total block are the two signature moments.",
+    "keyCharacteristics": [
+      "Paper-first two-column desk: a 560 px form and a fluid A4 preview.",
+      "One sky family, with deep sky reserved for the primary action and the total.",
+      "Hairline borders, 8 to 18 px radii, tabular numerals for every amount.",
+      "System sans by design, for reliable offline and file:// rendering.",
+      "Print is a first-class output: A4, repeated table headers, unbroken rows."
+    ],
+    "rules": [
+      {
+        "name": "The Paper Is The Accent Rule",
+        "body": "Deep sky is for the primary action and the total. It never becomes a page-wide wash, a card background, or a decorative heading color.",
+        "section": "colors"
+      },
+      {
+        "name": "The Status Color Rule",
+        "body": "Green, red, and amber appear only on status, validation, or destructive controls. They are not part of the brand palette.",
+        "section": "colors"
+      },
+      {
+        "name": "The Tabular Money Rule",
+        "body": "Every amount, quantity, date, and invoice number uses tabular numerals. Numbers must align vertically before they can be trusted.",
+        "section": "typography"
+      },
+      {
+        "name": "The One Display Rule",
+        "body": "Wide-tracked uppercase is reserved for the invoice wordmark and document labels. It never becomes the voice of the app chrome.",
+        "section": "typography"
+      },
+      {
+        "name": "The Paper Lifts Rule",
+        "body": "Only the invoice paper and modal surfaces carry a large shadow. Form panels stay flat; if everything floats, the paper stops being the object.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do keep the paper the brightest and largest object on the editor screen.",
+      "Do reserve deep sky for the primary action and the total block.",
+      "Do use tabular numerals for every amount and invoice number.",
+      "Do keep touch targets at 44 px, including chips, icon buttons, and history actions.",
+      "Do keep the system sans stack, because the app must render offline from file://.",
+      "Do test print output at A4 with background graphics enabled."
+    ],
+    "donts": [
+      "Don't add a dashboard, KPI cards, or a card mosaic around the invoice.",
+      "Don't turn the sky palette into a page-wide gradient or a purple-blue AI gradient.",
+      "Don't use pill shapes for ordinary buttons or inputs; pills are for status and save-state badges.",
+      "Don't use a colored left stripe, a glass panel, or a glow on cards.",
+      "Don't replace the A4 preview with a generic responsive card. The paper is the product.",
+      "Don't add motion beyond the 160 ms state transitions already used."
+    ]
+  }
+}
